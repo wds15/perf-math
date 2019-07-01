@@ -1,7 +1,7 @@
 MATH ?=math/
 include math/make/libraries
 
-CXXFLAGS+=-O3 -march=native -Ibenchmark/include -std=c++1y -Imath/ -I$(BOOST) -I$(SUNDIALS)/include -I$(EIGEN) -I$(TBB)/include
+CXXFLAGS+=-O3 -march=native -Ibenchmark/include -std=c++1y -Imath/ -I$(BOOST) -I$(SUNDIALS)/include -I$(EIGEN) -I$(TBB)/include -DSTAN_THREADS
 LDLIBS+=-lbenchmark
 LDFLAGS+=-Lbenchmark/build/src -L$(TBB)/lib -Wl,-rpath,"$(TBB)/lib" -ltbb -ltbbmalloc -ltbbmalloc_proxy
 CXX = clang++

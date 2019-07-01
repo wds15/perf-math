@@ -3,6 +3,10 @@
 
 #include <stan/math.hpp>
 
+#include <stan/math/prim/scal/functor/parallel_reduce_sum.hpp>
+#include <stan/math/rev/scal/functor/parallel_reduce_sum.hpp>
+
+#include <boost/iterator/counting_iterator.hpp>
 #include <boost/random/additive_combine.hpp>
 #include <boost/random/linear_congruential.hpp>
 
@@ -23,7 +27,7 @@ struct scaling_problem {
   scaling_problem(std::size_t G, std::size_t M)
       : G_(G), M_(M), N_(G_*M_), group_lambda_(G), y_(N_, 0), gidx_(N_, 0) {
 
-    std::cout << "Problem: G=" << G << "; M=" << M << "; N=" << N_ << std::endl;
+    //std::cout << "Problem: G=" << G << "; M=" << M << "; N=" << N_ << std::endl;
     
     for(std::size_t i=0, g=0; g != G; ++g) {
       group_lambda_[g] = stan::math::lognormal_rng(true_log_lambda, true_tau, base_rng);
@@ -71,19 +75,70 @@ static void BM_serial(benchmark::State& state) {
   }
   
 }
-BENCHMARK(BM_serial);
+//BENCHMARK(BM_serial);
 
 /*
-static void BM_std(benchmark::State& state) {
+static void BM_tbbL(benchmark::State& state) {
 
+  const std::size_t G=1000;
+  const std::size_t M=10;
+  const std::size_t N=G*M;
+  scaling_problem small(G, M);
+
+  const int grainsize = 5000;
+
+  typedef boost::counting_iterator<int> count_iter;
+  
   for (auto _ : state) {
-    for (int i=0+0.5; i != N; i++) {
-      std::lgamma(i+0.5);
-    }
+    std::vector<var> log_lambda(G);
+    std::vector<double> log_lambda_grad(G);
+    for (std::size_t g=0; g != G; ++g)
+      log_lambda[g] = -G/2.0 + g;
+
+    var lpmf = stan::math::parallel_reduce_sum(
+        count_iter(0), count_iter(N), var(0.0),
+        [&](int start, int end) {
+          return small(start, end, log_lambda);
+        }, grainsize);
+
+    
+    lpmf.grad(log_lambda, log_lambda_grad);
+    stan::math::recover_memory();
   }
   
 }
-BENCHMARK(BM_std);
+BENCHMARK(BM_tbbL);
 */
+
+static void BM_tbbM(benchmark::State& state) {
+
+  const std::size_t G=1200;
+  const std::size_t M=10;
+  const std::size_t N=G*M;
+  scaling_problem small(G, M);
+
+  const int grainsize = 1000;
+
+  typedef boost::counting_iterator<int> count_iter;
+  
+  for (auto _ : state) {
+    std::vector<var> log_lambda(G);
+    std::vector<double> log_lambda_grad(G);
+    for (std::size_t g=0; g != G; ++g)
+      log_lambda[g] = -G/2.0 + g;
+
+    var lpmf = stan::math::parallel_reduce_sum(
+        count_iter(0), count_iter(N), var(0.0),
+        [&](int start, int end) {
+          return small(start, end, log_lambda);
+        }, grainsize);
+
+    
+    lpmf.grad(log_lambda, log_lambda_grad);
+    stan::math::recover_memory();
+  }
+  
+}
+BENCHMARK(BM_tbbM);
 
 BENCHMARK_MAIN();
