@@ -1,10 +1,10 @@
 MATH ?=math/
 include math/make/libraries
 
-CXXFLAGS+=-O3 -march=native -Ibenchmark/include -std=c++1y -Imath/ -I$(BOOST) -I$(SUNDIALS)/include -I$(EIGEN)
+CXXFLAGS+=-O3 -march=native -Ibenchmark/include -std=c++1y -Imath/ -I$(BOOST) -I$(SUNDIALS)/include -I$(EIGEN) -I$(TBB)/include
 LDLIBS+=-lbenchmark
-LDFLAGS+=-Lbenchmark/build/src
-CXX ?= clang++
+LDFLAGS+=-Lbenchmark/build/src -L$(TBB)/lib -Wl,-rpath,"$(TBB)/lib" -ltbb -ltbbmalloc -ltbbmalloc_proxy
+CXX = clang++
 
 update: 
 	git submodule update --init --recursive
