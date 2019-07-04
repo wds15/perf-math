@@ -12,3 +12,6 @@ STAN_NUM_THREADS=2 ./tbb-scale --benchmark_repetitions=$REPL
 
 echo "4 CORES"
 STAN_NUM_THREADS=4 ./tbb-scale --benchmark_repetitions=$REPL
+
+echo "6 CORES"
+STAN_NUM_THREADS=6 ./tbb-scale --benchmark_repetitions=$REPL

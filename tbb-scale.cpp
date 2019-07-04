@@ -117,7 +117,7 @@ static void BM_tbbM(benchmark::State& state) {
   const std::size_t N=G*M;
   scaling_problem small(G, M);
 
-  const int grainsize = 1000;
+  const int grainsize = 100;
 
   typedef boost::counting_iterator<int> count_iter;
   
