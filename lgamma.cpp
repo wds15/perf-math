@@ -1,5 +1,3 @@
-#define _REENTRANT
-
 #include <benchmark/benchmark.h>
 #include <boost/math/special_functions/gamma.hpp>
 #include <stan/math/prim/scal/fun/boost_policy.hpp>
