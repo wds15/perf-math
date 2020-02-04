@@ -1,7 +1,9 @@
 MATH ?=math/
 include $(MATH)make/standalone
 
-CXXFLAGS+=-O3 -march=native -Ibenchmark/include
+STAN ?=stan/
+
+CXXFLAGS+=-O3 -march=native -Ibenchmark/include -I. -I$(STAN)/src
 LDLIBS+=-lbenchmark
 LDFLAGS+=-Lbenchmark/build/src
 CXX ?= clang++
