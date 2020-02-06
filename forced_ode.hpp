@@ -105,7 +105,15 @@ static const std::vector<string> locations_array__ = {" (found before start of p
                                                       " (in '../stan_pkpd/amici/forced_ode.stan', line 25, column 4 to column 26)",
                                                       " (in '../stan_pkpd/amici/forced_ode.stan', line 26, column 4 to column 81)",
                                                       " (in '../stan_pkpd/amici/forced_ode.stan', line 27, column 4 to column 42)",
-                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 24, column 80 to line 28, column 3)"};
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 24, column 80 to line 28, column 3)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 32, column 4 to column 23)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 33, column 4 to column 23)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 34, column 4 to line 35, column 46)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 37, column 4 to column 16)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 31, column 83 to line 38, column 3)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 41, column 4 to column 15)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 42, column 4 to column 111)",
+                                                      " (in '../stan_pkpd/amici/forced_ode.stan', line 40, column 91 to line 43, column 3)"};
 
 template <typename T0__, typename T1__, typename T2__, typename T3__>
 std::vector<typename boost::math::tools::promote_args<T0__, T1__, T2__,
@@ -270,6 +278,107 @@ operator()(const std::vector<T0__>& y, const std::vector<T1__>& time,
            const std::vector<double>& dose_time, std::ostream* pstream__)  const 
 {
 return subject_lpdf(y, time, theta, dose_time, pstream__);
+}
+};
+
+template <typename T0__, typename T1__, typename T2__, typename T3__>
+std::vector<typename boost::math::tools::promote_args<T0__, T1__, T2__,
+T3__>::type>
+oral_1cmt_basic(const T0__& time, const std::vector<T1__>& y,
+                const std::vector<T2__>& theta, const std::vector<T3__>& x_r,
+                const std::vector<int>& x_i, std::ostream* pstream__) {
+  using local_scalar_t__ = typename boost::math::tools::promote_args<T0__,
+          T1__,
+          T2__,
+          T3__>::type;
+  const static bool propto__ = true;
+  (void) propto__;
+  
+  try {
+    local_scalar_t__ ka;
+    
+    current_statement__ = 18;
+    ka = std::numeric_limits<double>::quiet_NaN();
+    current_statement__ = 18;
+    ka = theta[(1 - 1)];
+    local_scalar_t__ ke;
+    
+    current_statement__ = 19;
+    ke = std::numeric_limits<double>::quiet_NaN();
+    current_statement__ = 19;
+    ke = theta[(2 - 1)];
+    current_statement__ = 20;
+    validate_non_negative_index("dydt", "2", 2);
+    std::vector<local_scalar_t__> dydt;
+    dydt = std::vector<local_scalar_t__>(2, 0);
+    
+    current_statement__ = 20;
+    dydt = stan::math::array_builder<local_scalar_t__>()
+        .add((-ka * y[(1 - 1)])).add(((ka * y[(1 - 1)]) - (ke * y[(2 - 1)])))
+        .array();
+    current_statement__ = 21;
+    return dydt;
+  } catch (const std::exception& e) {
+    stan::lang::rethrow_located(e, locations_array__[current_statement__]);
+      // Next line prevents compiler griping about no return
+      throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***"); 
+  }
+  
+}
+
+struct oral_1cmt_basic_functor__ {
+template <typename T0__, typename T1__, typename T2__, typename T3__>
+std::vector<typename boost::math::tools::promote_args<T0__, T1__, T2__,
+T3__>::type>
+operator()(const T0__& time, const std::vector<T1__>& y,
+           const std::vector<T2__>& theta, const std::vector<T3__>& x_r,
+           const std::vector<int>& x_i, std::ostream* pstream__)  const 
+{
+return oral_1cmt_basic(time, y, theta, x_r, x_i, pstream__);
+}
+};
+
+template <typename T0__, typename T1__, typename T2__>
+std::vector<std::vector<typename boost::math::tools::promote_args<T0__, T1__,
+T2__>::type>>
+integrate_bdf_basic(const std::vector<T0__>& time,
+                    const std::vector<T1__>& y0,
+                    const std::vector<T2__>& theta,
+                    const std::vector<double>& dose_time,
+                    std::ostream* pstream__) {
+  using local_scalar_t__ = typename boost::math::tools::promote_args<T0__,
+          T1__,
+          T2__>::type;
+  const static bool propto__ = true;
+  (void) propto__;
+  
+  try {
+    current_statement__ = 23;
+    validate_non_negative_index("x_i", "0", 0);
+    std::vector<int> x_i;
+    x_i = std::vector<int>(0, 0);
+    
+    current_statement__ = 24;
+    return integrate_ode_bdf(oral_1cmt_basic_functor__(), y0,
+             (time[(1 - 1)] - 1E-6), time, theta, dose_time, x_i, pstream__,
+             1E-6, 1E-6, 1E3);
+  } catch (const std::exception& e) {
+    stan::lang::rethrow_located(e, locations_array__[current_statement__]);
+      // Next line prevents compiler griping about no return
+      throw std::runtime_error("*** IF YOU SEE THIS, PLEASE REPORT A BUG ***"); 
+  }
+  
+}
+
+struct integrate_bdf_basic_functor__ {
+template <typename T0__, typename T1__, typename T2__>
+std::vector<std::vector<typename boost::math::tools::promote_args<T0__, T1__,
+T2__>::type>>
+operator()(const std::vector<T0__>& time, const std::vector<T1__>& y0,
+           const std::vector<T2__>& theta,
+           const std::vector<double>& dose_time, std::ostream* pstream__)  const 
+{
+return integrate_bdf_basic(time, y0, theta, dose_time, pstream__);
 }
 };
 
